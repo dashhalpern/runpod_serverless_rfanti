@@ -171,11 +171,11 @@ def handler(job):
     subprocess.call(cmd2, shell=True)
 
     write_csv_from_folder(
-        f"/home/protien_out_{name}", f"/workspace/original_anti_{name}.csv"
+        f"/home/protien_out_{name}", f"/runpod-volume/original_anti_{name}.csv"
     )
     adjust_seqs(
-        f"/workspace/original_anti_{name}.csv",
-        f"/workspace/modified_anti_{name}.csv",
+        f"/runpod-volume/original_anti_{name}.csv",
+        f"/runpod-volume/modified_anti_{name}.csv",
     )
 
     return f"Hello, {name}!"

@@ -5,7 +5,6 @@ RUN ln -sf $(which python3.10) /usr/local/bin/python && \
     ln -sf $(which python3.10) /usr/local/bin/python3
 
 # Install dependencies
-COPY poetry.lock /poetry.lock
 COPY requirements.txt /requirements.txt
 RUN uv pip install --upgrade -r /requirements.txt --no-cache-dir --system
 

@@ -6,10 +6,11 @@
   "iconUrl": "https://dummyimage.com/100x100/5733ff/fff&text=SW",
   "config": {
     "runsOn": "GPU",
-    "containerDiskInGb": 5,
+    "containerDiskInGb": 32,
     "gpuIds": "ADA_24",
     "gpuCount": 1,
     "allowedCudaVersions": [
+      "11.8",
       "12.7",
       "12.6",
       "12.5",

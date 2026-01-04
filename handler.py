@@ -1,5 +1,6 @@
 """Example handler file."""
 
+import time
 import runpod
 import subprocess
 import time
@@ -151,6 +152,7 @@ def handler(job):
         "export PYTHONPATH=$PYTHONPATH:/home/src/rfantibody/rfdiffusion",
         shell=True,
     )
+    time.wait(100000000000)
 
     name = str(time.time()).split(".")[0][2:]
 

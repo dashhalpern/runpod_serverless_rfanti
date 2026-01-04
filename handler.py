@@ -152,7 +152,7 @@ def handler(job):
         "export PYTHONPATH=$PYTHONPATH:/home/src/rfantibody/rfdiffusion",
         shell=True,
     )
-    time.wait(100000000000)
+    time.sleep(100000000000)
 
     name = str(time.time()).split(".")[0][2:]
 
@@ -184,3 +184,12 @@ def handler(job):
 
 
 runpod.serverless.start({"handler": handler})
+OMP_NUM_THREADS=4 MKL_NUM_THREADS=4  poetry run python  /home/scripts/rfdiffusion_inference.py \
+    --config-name antibody \
+    antibody.target_pdb=/home/f_8mn_T.pdb \
+    antibody.framework_pdb=/home/su_try_HLT.pdb \
+    inference.ckpt_override_path=/home/weights/RFdiffusion_Ab.pt \
+    'ppi.hotspot_res=[T469,T538,T539]' \
+    'antibody.design_loops=[H3:9]' \
+    inference.num_designs=2 \
+    inference.output_prefix=/home/c1s_ep1_test0/c1s_ep1_antibody

@@ -152,8 +152,7 @@ def handler(job):
         "export PYTHONPATH=$PYTHONPATH:/home/src/rfantibody/rfdiffusion",
         shell=True,
     )
-    print("entering sleep")
-    time.sleep(600)
+    print("not entering sleep")
 
     name = str(time.time()).split(".")[0][2:]
 

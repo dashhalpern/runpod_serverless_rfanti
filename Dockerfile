@@ -7,6 +7,7 @@ RUN ln -sf $(which python3.10) /usr/local/bin/python && \
 # Install dependencies
 COPY requirements.txt /requirements.txt
 RUN uv pip install --upgrade -r /requirements.txt --no-cache-dir --system
+ENV PYTHONPATH="${PYTHONPATH}:/home/src/rfantibody/rfdiffusion"
 
 # Add files
 ADD handler.py .

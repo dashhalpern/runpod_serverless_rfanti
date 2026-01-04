@@ -145,7 +145,7 @@ def handler(job):
 
     subprocess.call("cp -a /runpod-volume/transfer/. /home", shell=True)
     os.chdir("/home")
-    subprocess.call("pip install poetry", shell=True)
+    subprocess.call("python3.10 -m pip install poetry", shell=True)
     subprocess.call("bash /home/include/setup.sh", shell=True)
     subprocess.call(
         "export PYTHONPATH=$PYTHONPATH:/home/src/rfantibody/rfdiffusion",

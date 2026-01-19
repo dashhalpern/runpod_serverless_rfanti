@@ -1,7 +1,8 @@
 """Example handler file."""
 
 import time
-import runpod
+
+# import runpod
 import subprocess
 import time
 from ablang2 import pretrained
@@ -122,19 +123,12 @@ def fix_seq(hc):
     else:
         targets = find_positions_next_to_HRK(hcdr3)
         modified_hcdr3s = [hcdr3[:i] + "H" + hcdr3[i + 1 :] for i in targets]
-
-        print("precheck")
-        print(modified_hcdr3s)
-        print(check_sequence("A" + hcdr3 + "W") for i in modified_hcdr3s)
         modified_hcdr3s = [
             hcdr3
             for hcdr3 in modified_hcdr3s
             if check_sequence("A" + hcdr3 + "W")
         ]
-        print("postcheck")
-        print(modified_hcdr3s)
-
-        if len(modified_hcdr3s):
+        if len(modified_hcdr3s) == 0:
             return None
         modified_hcs = [wt_hc_prefix + i + wt_hc_post for i in modified_hcdr3s]
         model = pretrained()
@@ -149,10 +143,9 @@ def fix_seq(hc):
 def adjust_seqs(in_csv, out_csv):
     df = pd.read_csv(in_csv)
     df["conseq"] = df.seq.apply(fix_seq)
-    df0 = df[df.conseq.apply(lambda r: r is not None)]
+    df0 = df[df.conseq.apply(lambda r: r is not None)].copy()
     df0["end_seq"] = df0.conseq.apply(lambda r: r[0])
     df0["conf"] = df0.conseq.apply(lambda r: r[1])
-    len(df0)
     names = np.unique(df0.name)
     outdf = []
     for cname in names:
@@ -216,4 +209,4 @@ def handler(job):
     return f"Hello, {name}!"
 
 
-runpod.serverless.start({"handler": handler})
+# runpod.serverless.start({"handler": handler})

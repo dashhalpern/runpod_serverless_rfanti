@@ -10,6 +10,25 @@ import numpy as np
 from Bio.PDB import PDBParser
 from Bio.SeqUtils import seq1
 import os
+import re
+
+motifs = ""
+motifs += "N[GSA]|"
+motifs += "D[GS]|"
+motifs += "N[^P][ST]"
+cdrmotifs = "D[DGHSTP]"
+motifs = re.compile(motifs)
+cdrmotifs = re.compile(cdrmotifs)
+
+
+def check_sequence(seq):
+    motif_present = motifs.search(seq)
+    if motif_present:
+        return False
+    motif_present = cdrmotifs.search(seq)
+    if motif_present:
+        return False
+    return True
 
 
 def get_seq(file_location):
@@ -103,6 +122,13 @@ def fix_seq(hc):
     else:
         targets = find_positions_next_to_HRK(hcdr3)
         modified_hcdr3s = [hcdr3[:i] + "H" + hcdr3[i + 1 :] for i in targets]
+        modified_hcdr3s = [
+            hcdr3
+            for hcdr3 in modified_hcdr3s
+            if check_sequence("A" + hcdr3 + "W")
+        ]
+        if len(modified_hcdr3s):
+            return None
         modified_hcs = [wt_hc_prefix + i + wt_hc_post for i in modified_hcdr3s]
         model = pretrained()
         results = [
@@ -158,7 +184,7 @@ def handler(job):
 
     cmd1 = f"""OMP_NUM_THREADS=4 MKL_NUM_THREADS=4  poetry run python  /home/scripts/rfdiffusion_inference.py \
     --config-name antibody \
-    antibody.target_pdb=/home/f_8mn_T.pdb \
+    antibody.target_pdb=/home/1ELV_trunc_T.pdb \
     antibody.framework_pdb=/home/su_try_HLT.pdb \
     inference.ckpt_override_path=/home/weights/RFdiffusion_Ab.pt \
     'ppi.hotspot_res=[T469,T538,T539]' \

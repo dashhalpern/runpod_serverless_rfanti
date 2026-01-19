@@ -122,11 +122,18 @@ def fix_seq(hc):
     else:
         targets = find_positions_next_to_HRK(hcdr3)
         modified_hcdr3s = [hcdr3[:i] + "H" + hcdr3[i + 1 :] for i in targets]
+
+        print("precheck")
+        print(modified_hcdr3s)
+        print(check_sequence("A" + hcdr3 + "W") for i in modified_hcdr3s)
         modified_hcdr3s = [
             hcdr3
             for hcdr3 in modified_hcdr3s
             if check_sequence("A" + hcdr3 + "W")
         ]
+        print("postcheck")
+        print(modified_hcdr3s)
+
         if len(modified_hcdr3s):
             return None
         modified_hcs = [wt_hc_prefix + i + wt_hc_post for i in modified_hcdr3s]

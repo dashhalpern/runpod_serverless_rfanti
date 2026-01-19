@@ -1,6 +1,7 @@
 """Example handler file."""
 
 import time
+import shutil
 
 # import runpod
 import subprocess
@@ -206,6 +207,8 @@ def handler(job):
             f"/runpod-volume/original_anti_{name}.csv",
             f"/runpod-volume/modified_anti_{name}.csv",
         )
+        shutil.rmtree(f"/home/protien_out_{name}")
+        shutil.rmtree(f"/home/c1s_ep1_{name}")
 
     return f"Hello, {name}!"
 

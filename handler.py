@@ -181,30 +181,31 @@ def handler(job):
     print("not entering sleep")
 
     name = str(time.time()).split(".")[0][2:]
+    for i in range(8):
+        cmd1 = f"""OMP_NUM_THREADS=4 MKL_NUM_THREADS=4  poetry run python  /home/scripts/rfdiffusion_inference.py \
+        --config-name antibody \
+        antibody.target_pdb=/home/1ELV_trunc_T.pdb \
+        antibody.framework_pdb=/home/su_try_HLT.pdb \
+        inference.ckpt_override_path=/home/weights/RFdiffusion_Ab.pt \
+        'ppi.hotspot_res=[T469,T538,T539]' \
+        'antibody.design_loops=[H3:9]' \
+        inference.num_designs=25 \
+        inference.output_prefix=/home/c1s_ep1_{name}/c1s_ep1_antibody"""
+        subprocess.call(cmd1, shell=True)
+        cmd2 = f"""poetry run python /home/scripts/proteinmpnn_interface_design.py \
+        -seqs_per_struct 5 \
+        -pdbdir /home/c1s_ep1_{name} \
+        -outpdbdir /home/protien_out_{name}/c1s_ep1_multi"""
+        subprocess.call(cmd2, shell=True)
 
-    cmd1 = f"""OMP_NUM_THREADS=4 MKL_NUM_THREADS=4  poetry run python  /home/scripts/rfdiffusion_inference.py \
-    --config-name antibody \
-    antibody.target_pdb=/home/1ELV_trunc_T.pdb \
-    antibody.framework_pdb=/home/su_try_HLT.pdb \
-    inference.ckpt_override_path=/home/weights/RFdiffusion_Ab.pt \
-    'ppi.hotspot_res=[T469,T538,T539]' \
-    'antibody.design_loops=[H3:9]' \
-    inference.num_designs=2 \
-    inference.output_prefix=/home/c1s_ep1_{name}/c1s_ep1_antibody"""
-    subprocess.call(cmd1, shell=True)
-    cmd2 = f"""poetry run python /home/scripts/proteinmpnn_interface_design.py \
-    -seqs_per_struct 5 \
-    -pdbdir /home/c1s_ep1_{name} \
-    -outpdbdir /home/protien_out_{name}/c1s_ep1_multi"""
-    subprocess.call(cmd2, shell=True)
-
-    write_csv_from_folder(
-        f"/home/protien_out_{name}", f"/runpod-volume/original_anti_{name}.csv"
-    )
-    adjust_seqs(
-        f"/runpod-volume/original_anti_{name}.csv",
-        f"/runpod-volume/modified_anti_{name}.csv",
-    )
+        write_csv_from_folder(
+            f"/home/protien_out_{name}",
+            f"/runpod-volume/original_anti_{name}.csv",
+        )
+        adjust_seqs(
+            f"/runpod-volume/original_anti_{name}.csv",
+            f"/runpod-volume/modified_anti_{name}.csv",
+        )
 
     return f"Hello, {name}!"
 

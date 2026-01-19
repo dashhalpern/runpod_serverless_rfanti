@@ -3,7 +3,7 @@
 import time
 import shutil
 
-# import runpod
+import runpod
 import subprocess
 import time
 from ablang2 import pretrained
@@ -213,4 +213,4 @@ def handler(job):
     return f"Hello, {name}!"
 
 
-# runpod.serverless.start({"handler": handler})
+runpod.serverless.start({"handler": handler})

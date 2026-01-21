@@ -181,8 +181,8 @@ def handler(job):
     )
     print("not entering sleep")
 
-    name = str(time.time()).split(".")[0][2:]
     for i in range(8):
+        name = str(time.time()).split(".")[0][2:]
         cmd1 = f"""OMP_NUM_THREADS=4 MKL_NUM_THREADS=4  poetry run python  /home/scripts/rfdiffusion_inference.py \
         --config-name antibody \
         antibody.target_pdb=/home/1ELV_trunc_T.pdb \

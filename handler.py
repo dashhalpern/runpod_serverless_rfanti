@@ -181,7 +181,7 @@ def handler(job):
     )
     print("not entering sleep")
 
-    for i in range(2):
+    for i in range(1):
         name = str(time.time()).split(".")[0][2:]
         cmd1 = f"""OMP_NUM_THREADS=4 MKL_NUM_THREADS=4  poetry run python  /home/scripts/rfdiffusion_inference.py \
         --config-name antibody \
@@ -209,8 +209,8 @@ def handler(job):
             f"/runpod-volume/modified_anti_ep2_{name}.csv",
         )
         """
-        shutil.rmtree(f"/home/protien_out_ep2_{name}")
-        shutil.rmtree(f"/home/c1s_ep2_{name}")
+        #shutil.rmtree(f"/home/protien_out_ep2_{name}")
+        #shutil.rmtree(f"/home/c1s_ep2_{name}")
 
     return f"Hello, {name}!"
 

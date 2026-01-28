@@ -185,32 +185,32 @@ def handler(job):
         name = str(time.time()).split(".")[0][2:]
         cmd1 = f"""OMP_NUM_THREADS=4 MKL_NUM_THREADS=4  poetry run python  /home/scripts/rfdiffusion_inference.py \
         --config-name antibody \
-        antibody.target_pdb=/home/1ELV_trunc_T.pdb \
+        antibody.target_pdb=/home/f_8mn_T.pdb \
         antibody.framework_pdb=/home/su_try_HLT.pdb \
         inference.ckpt_override_path=/home/weights/RFdiffusion_Ab.pt \
-        'ppi.hotspot_res=[T469,T538,T539]' \
+        'ppi.hotspot_res=[]' \
         'antibody.design_loops=[H3:9]' \
         inference.num_designs=25 \
-        inference.output_prefix=/home/c1s_ep1_{name}/c1s_ep1_antibody"""
+        inference.output_prefix=/home/c1s_ep2_{name}/c1s_ep2_antibody"""
         subprocess.call(cmd1, shell=True)
         cmd2 = f"""poetry run python /home/scripts/proteinmpnn_interface_design.py \
         -seqs_per_struct 5 \
-        -pdbdir /home/c1s_ep1_{name} \
-        -outpdbdir /home/protien_out_{name}/c1s_ep1_multi"""
+        -pdbdir /home/c1s_ep2_{name} \
+        -outpdbdir /home/protien_out_ep2_{name}/c1s_ep2_multi"""
         subprocess.call(cmd2, shell=True)
 
         write_csv_from_folder(
-            f"/home/protien_out_{name}",
-            f"/runpod-volume/original_anti_{name}.csv",
+            f"/home/protien_out_ep2_{name}",
+            f"/runpod-volume/original_anti_ep2_{name}.csv",
         )
         """
         adjust_seqs(
-            f"/runpod-volume/original_anti_{name}.csv",
-            f"/runpod-volume/modified_anti_{name}.csv",
+            f"/runpod-volume/original_anti_ep2_{name}.csv",
+            f"/runpod-volume/modified_anti_ep2_{name}.csv",
         )
         """
-        shutil.rmtree(f"/home/protien_out_{name}")
-        shutil.rmtree(f"/home/c1s_ep1_{name}")
+        shutil.rmtree(f"/home/protien_out_ep2_{name}")
+        shutil.rmtree(f"/home/c1s_ep2_{name}")
 
     return f"Hello, {name}!"
 

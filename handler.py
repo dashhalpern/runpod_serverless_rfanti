@@ -164,6 +164,44 @@ def adjust_seqs(in_csv, out_csv):
     pd.DataFrame(outdf).to_csv(out_csv)
 
 
+def change_for_targetless():
+    with open(
+        "/home/src/rfantibody/rfdiffusion/inference/ab_pose.py", "r"
+    ) as f:
+        content = f.read()
+
+    # The exact old code to replace
+    old_code = """        np_loop_masks = {l: np.concatenate(loop_masks[l], axis=0) for l in self.cdr_names}
+
+            return np_loop_masks"""
+
+    # The new fixed code
+    new_code = """        # Fixed: only concatenate if we have arrays to concatenate
+            np_loop_masks = {}
+            for l in self.cdr_names:
+                if len(loop_masks[l]) > 0:
+                    np_loop_masks[l] = np.concatenate(loop_masks[l], axis=0)
+                else:
+                    # If no masks exist, create array of zeros with length of current pose
+                    np_loop_masks[l] = np.zeros(self.length(), dtype=bool)
+
+            return np_loop_masks"""
+
+    # Replace
+    if old_code in content:
+        content = content.replace(old_code, new_code)
+        print("Successfully patched!")
+    else:
+        print("ERROR: Could not find exact code to replace")
+        exit(1)
+
+    # Write back
+    with open(
+        "/home/src/rfantibody/rfdiffusion/inference/ab_pose.py", "w"
+    ) as f:
+        f.write(content)
+
+
 def handler(job):
     """Handler function that will be used to process jobs."""
     job_input = job["input"]
@@ -181,14 +219,13 @@ def handler(job):
     )
     print("not entering sleep")
     #        antibody.target_pdb=/home/f_8mn_T.pdb \
-
+    change_for_targetless()
     for i in range(1):
         name = str(time.time()).split(".")[0][2:]
-        cmd1 = f"""OMP_NUM_THREADS=4 MKL_NUM_THREADS=4  poetry run python  /home/scripts/rfdiffusion_inference.py \
+        cmd1 = f"""OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 poetry run python /home/scripts/rfdiffusion_inference.py \
         --config-name antibody \
-        antibody.framework_pdb=/home/su_try_HLT.pdb \
+        inference.input_pdb=/home/su_try_HLT.pdb \
         inference.ckpt_override_path=/home/weights/RFdiffusion_Ab.pt \
-        'ppi.hotspot_res=[]' \
         'antibody.design_loops=[H3:9]' \
         inference.num_designs=25 \
         inference.output_prefix=/home/c1s_noep_{name}/c1s_noep_antibody"""

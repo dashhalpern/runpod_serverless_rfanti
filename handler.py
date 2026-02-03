@@ -14,6 +14,24 @@ from Bio.SeqUtils import seq1
 import os
 import re
 
+
+CONFIG = {
+    # Input/Output paths
+    "framework_pdb": "/home/su_try_HLT.pdb",
+    "output_dir": "/home/c1s_noep_temp",
+    "weights": "/home/weights/RFdiffusion_Ab.pt",
+    # Design parameters
+    "design_loops": "[H3:9]",  # Format: [H3:9] or [H3:8-12] or [H3:9,L3:10]
+    "num_designs": 25,
+    # Performance settings
+    "omp_threads": 4,
+    "mkl_threads": 4,
+    # File paths (don't change these unless you know what you're doing)
+    "ab_pose_path": "/home/src/rfantibody/rfdiffusion/inference/ab_pose.py",
+    "inference_script": "/home/scripts/rfdiffusion_inference.py",
+}
+
+
 motifs = ""
 motifs += "N[GSA]|"
 motifs += "D[GS]|"
@@ -164,42 +182,54 @@ def adjust_seqs(in_csv, out_csv):
     pd.DataFrame(outdf).to_csv(out_csv)
 
 
-def change_for_targetless():
-    with open(
-        "/home/src/rfantibody/rfdiffusion/inference/ab_pose.py", "r"
-    ) as f:
-        content = f.read()
+def apply_patch():
+    """Apply the patch to fix untargeted design"""
+
+    # Read the original file
+    try:
+        with open(CONFIG["ab_pose_path"], "r") as f:
+            content = f.read()
+    except Exception as e:
+        print(f"  ✗ Error reading file: {e}")
+        return False
+
+    # Check if already patched
+    if "Fixed: only concatenate if we have arrays to concatenate" in content:
+        print("  ✓ File already patched")
+        return True
 
     # The exact old code to replace
     old_code = """        np_loop_masks = {l: np.concatenate(loop_masks[l], axis=0) for l in self.cdr_names}
 
-            return np_loop_masks"""
+        return np_loop_masks"""
 
     # The new fixed code
     new_code = """        # Fixed: only concatenate if we have arrays to concatenate
-            np_loop_masks = {}
-            for l in self.cdr_names:
-                if len(loop_masks[l]) > 0:
-                    np_loop_masks[l] = np.concatenate(loop_masks[l], axis=0)
-                else:
-                    # If no masks exist, create array of zeros with length of current pose
-                    np_loop_masks[l] = np.zeros(self.length(), dtype=bool)
+        np_loop_masks = {}
+        for l in self.cdr_names:
+            if len(loop_masks[l]) > 0:
+                np_loop_masks[l] = np.concatenate(loop_masks[l], axis=0)
+            else:
+                # If no masks exist, create array of zeros with length of current pose
+                np_loop_masks[l] = np.zeros(self.length(), dtype=bool)
 
-            return np_loop_masks"""
+        return np_loop_masks"""
 
     # Replace
     if old_code in content:
         content = content.replace(old_code, new_code)
-        print("Successfully patched!")
+        try:
+            with open(CONFIG["ab_pose_path"], "w") as f:
+                f.write(content)
+            print("  ✓ Patch applied successfully!")
+            return True
+        except Exception as e:
+            print(f"  ✗ Error writing patched file: {e}")
+            return False
     else:
-        print("ERROR: Could not find exact code to replace")
-        exit(1)
-
-    # Write back
-    with open(
-        "/home/src/rfantibody/rfdiffusion/inference/ab_pose.py", "w"
-    ) as f:
-        f.write(content)
+        print("  ✗ ERROR: Could not find exact code to replace")
+        print("  The file may have been modified or is incompatible")
+        return False
 
 
 def handler(job):
@@ -219,7 +249,7 @@ def handler(job):
     )
     print("not entering sleep")
     #        antibody.target_pdb=/home/f_8mn_T.pdb \
-    change_for_targetless()
+    apply_patch()
     for i in range(1):
         name = str(time.time()).split(".")[0][2:]
         cmd1 = f"""OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 poetry run python /home/scripts/rfdiffusion_inference.py \

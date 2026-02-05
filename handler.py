@@ -258,17 +258,18 @@ def handler(job):
         inference.ckpt_override_path=/home/weights/RFdiffusion_Ab.pt \
         'antibody.design_loops=[H3:9]' \
         inference.num_designs=25 \
-        inference.output_prefix=/home/c1s_noep_{name}/c1s_noep_antibody"""
+        diffuser.T=2.0 \
+        inference.output_prefix=/home/c1s_noep_{name}/c1s_noep_ht_antibody"""
         subprocess.call(cmd1, shell=True)
         cmd2 = f"""poetry run python /home/scripts/proteinmpnn_interface_design.py \
         -seqs_per_struct 5 \
-        -pdbdir /home/c1s_noep_{name} \
-        -outpdbdir /home/protien_out_noep_{name}/c1s_noep_multi"""
+        -pdbdir /home/c1s_noep_ht_{name} \
+        -outpdbdir /home/protien_out_noep_ht_{name}/c1s_noep_ht_multi"""
         subprocess.call(cmd2, shell=True)
 
         write_csv_from_folder(
-            f"/home/protien_out_noep_{name}",
-            f"/runpod-volume/original_anti_noep_{name}.csv",
+            f"/home/protien_out_noep_ht_{name}",
+            f"/runpod-volume/original_anti_noep_ht_{name}.csv",
         )
         """
         adjust_seqs(

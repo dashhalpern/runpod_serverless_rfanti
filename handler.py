@@ -3,10 +3,11 @@
 import time
 import shutil
 
-import runpod
+# import runpod
 import subprocess
 import time
-from ablang2 import pretrained
+
+# from ablang2 import pretrained
 import pandas as pd
 import numpy as np
 from Bio.PDB import PDBParser
@@ -259,7 +260,7 @@ def handler(job):
         'antibody.design_loops=[H3:9]' \
         inference.num_designs=25 \
         +inference.T=1.4 \
-        inference.output_prefix=/home/c1s_noep_{name}/c1s_noep_ht_antibody"""
+        inference.output_prefix=/home/c1s_noep_ht_{name}/c1s_noep_ht_antibody"""
         subprocess.call(cmd1, shell=True)
         cmd2 = f"""poetry run python /home/scripts/proteinmpnn_interface_design.py \
         -seqs_per_struct 5 \
@@ -284,4 +285,4 @@ def handler(job):
     return f"Hello, {name}!"
 
 
-runpod.serverless.start({"handler": handler})
+# runpod.serverless.start({"handler": handler})

@@ -258,7 +258,7 @@ def handler(job):
         inference.ckpt_override_path=/home/weights/RFdiffusion_Ab.pt \
         'antibody.design_loops=[H3:9]' \
         inference.num_designs=25 \
-        diffuser.T=2 \
+        inference.T=2 \
         inference.output_prefix=/home/c1s_noep_{name}/c1s_noep_ht_antibody"""
         subprocess.call(cmd1, shell=True)
         cmd2 = f"""poetry run python /home/scripts/proteinmpnn_interface_design.py \

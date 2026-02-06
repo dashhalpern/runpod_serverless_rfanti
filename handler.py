@@ -3,7 +3,7 @@
 import time
 import shutil
 
-# import runpod
+import runpod
 import subprocess
 import time
 
@@ -285,4 +285,4 @@ def handler(job):
     return f"Hello, {name}!"
 
 
-# runpod.serverless.start({"handler": handler})
+runpod.serverless.start({"handler": handler})

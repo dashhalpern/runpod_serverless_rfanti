@@ -191,10 +191,12 @@ def handler(job):
         'ppi.hotspot_res=[]' \
         'antibody.design_loops=[H3:9]' \
         inference.num_designs=25 \
+        +inference.T=1.4 \
         inference.output_prefix=/home/c1s_ep2_{name}/c1s_ep2_antibody"""
         subprocess.call(cmd1, shell=True)
         cmd2 = f"""poetry run python /home/scripts/proteinmpnn_interface_design.py \
         -seqs_per_struct 5 \
+        -temperature 0.35 \
         -pdbdir /home/c1s_ep2_{name} \
         -outpdbdir /home/protien_out_ep2_{name}/c1s_ep2_multi"""
         subprocess.call(cmd2, shell=True)
@@ -209,8 +211,8 @@ def handler(job):
             f"/runpod-volume/modified_anti_ep2_{name}.csv",
         )
         """
-        #shutil.rmtree(f"/home/protien_out_ep2_{name}")
-        #shutil.rmtree(f"/home/c1s_ep2_{name}")
+        # shutil.rmtree(f"/home/protien_out_ep2_{name}")
+        # shutil.rmtree(f"/home/c1s_ep2_{name}")
 
     return f"Hello, {name}!"
 
